@@ -15,7 +15,7 @@ const createOrder = (storeName) => {
 
 // handles delivered event
 const handleDelivered = (payload) => {
-  console.log('PAYLOAD: ', payload);
+  // console.log('PAYLOAD: ', payload);
   console.log('Thank you for your order ' , payload.customer);
 };
 
