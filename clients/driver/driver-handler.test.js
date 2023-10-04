@@ -1,4 +1,4 @@
-const handlePickUp = require('../driver/handler.js');
+const handlePickUp = require('./handler.js');
 
 beforeEach(() => {
   console.log = jest.fn();
