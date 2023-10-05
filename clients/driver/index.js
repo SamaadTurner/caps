@@ -7,6 +7,8 @@ const socket = io.connect(CONNECTION_URL+'/caps');
 // TODO: how to pass a instance of the socket to the handler
 const handlePickUp = (payload) => {
   console.log('DRIVER: picked up ', payload.orderId);  
+  socket.emit('recieved',  payload );
+
   socket.emit('in-transit', payload);
   
   setTimeout(() => {
@@ -17,8 +19,9 @@ const handlePickUp = (payload) => {
 };
 
 
-socket.emit('join', {roomName: 'venderTest'});
+
+socket.emit('join', {roomName: '1-206-flowers'});
 socket.on('pickup', handlePickUp);
-// socket.emit('message', { text: 'Hello from driver client' });
+socket.emit('get-orders', '1-206-flowers');
 
 module.exports = socket;

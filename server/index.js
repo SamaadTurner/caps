@@ -1,6 +1,7 @@
 'using strict';
 
 const handleGlobalPackageEvents = require('./handler.js');
+const MessageQueue = require('../model/MessageQueue.js');
 const {Server} = require('socket.io');
 const PORT = process.env.PORT || 3002;
 
@@ -11,7 +12,7 @@ console.log('SServer Started ');
 
 // namespace server
 let capsServer = server.of('/caps');
-
+let driverQueue  = new MessageQueue();
 // built-in connection event that tells the server to wait for socket(clients) connections
 server.on('connection', (socket) => {
   console.log('IM LISTENING');
@@ -29,9 +30,20 @@ capsServer.on('connection', (socket) => {
   // list of all the events we are listening for in this server
   socket.on('pickup', (payload) => {
     handleGlobalPackageEvents('pickup', payload); 
+    let clientQueue = driverQueue.read(payload.store);
+    if(!clientQueue){
+      clientQueue = new MessageQueue();
+      driverQueue.store(payload.store, clientQueue);
+    } 
+    clientQueue.store(payload.orderId, payload);
     socket.broadcast.emit('pickup', payload);
+    console.log('QUEUE: ', clientQueue);
   });
 
+  socket.on('recieved', (payload) => {
+    driverQueue.read(payload.store).remove(payload.orderId);
+    console.log('DELETED ORDER', driverQueue.read(payload.store));
+  });
   
   socket.on('in-transit',  (payload) => {
     handleGlobalPackageEvents('in-transit', payload);
@@ -42,9 +54,15 @@ capsServer.on('connection', (socket) => {
     socket.broadcast.emit('delivered', payload);
   });
 
-  socket.on('message', (payload) => {
-    console.log('HERE IS OUR CAPS PAYLOAD', payload);
-    socket.broadcast.emit('message', payload);
+  socket.on('get-orders', (payload) => {
+    console.log('REtrieving orders for ', payload);
+    let storeQueue = driverQueue.read(payload);
+    if(storeQueue){
+
+      Object.values(storeQueue.data).forEach((order => socket.emit('pickup' , order)));
+    
+    }
+    
   });
 
   socket.on('join', (payload) => {

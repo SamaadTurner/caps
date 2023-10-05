@@ -1,13 +1,17 @@
 'use strict';
 
-const eventEmitter = require('../../eventPool.js');
+
+const Chance = require('chance');
+
+const chance = new Chance();
+
 
 const createOrder = (storeName) => {
   const order = {
     store: storeName,
-    orderId: 'e3669048-7313-427b-b6cc-74010ca1f8f0',
-    customer: 'Jamal Braun',
-    address: 'Schmittfort, LA',
+    orderId: chance.guid(),
+    customer: chance.name(),
+    address: chance.address(),
   };
   return order;
  
