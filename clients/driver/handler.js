@@ -11,5 +11,6 @@ const handlePickUp = (payload) => {
     console.log('DRIVER: delivered ', payload.orderId);
     socket.emit('delivered', payload);
   }, 3000);
+  
 };
 module.exports = handlePickUp;
